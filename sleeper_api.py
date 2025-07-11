@@ -1,7 +1,10 @@
+import mimetypes
+import os
+
 import requests
 
 BASE = "https://api.sleeper.app/v1"
-
+AVATAR_CDN = "https://sleepercdn.com/avatars"
 
 def get_user(username_or_id):
     res = requests.get(f"{BASE}/user/{username_or_id}")
@@ -38,6 +41,42 @@ def get_standings(league_id):
     return sorted(
         rosters, key=lambda r: (-r["settings"]["wins"], r["settings"]["losses"])
     )
+
+def get_avatars(league_id):
+    users = get_users_in_league(league_id)
+    os.makedirs("avatars", exist_ok=True)
+
+    avatar_filenames = []
+
+    for user in users:
+        metadata = user.get("metadata")
+        if metadata["avatar"]:
+            avatar_url = metadata["avatar"]
+        else:
+            avatar_id = user.get("avatar")
+            avatar_url = f"{AVATAR_CDN}/{avatar_id}"
+            try:
+                res = requests.get(avatar_url)
+                res.raise_for_status()
+
+                # Detect content type (e.g., image/jpeg)
+                content_type = res.headers.get("Content-Type", "").lower()
+                ext = mimetypes.guess_extension(content_type)
+
+                # Fallback to .webp if unknown
+                if not ext:
+                    ext = ".webp"
+
+                filename = f"{avatar_id}{ext}"
+                file_path = os.path.join("avatars", f"{avatar_id}.webp")
+                with open(file_path, "wb") as f:
+                    f.write(res.content)
+
+                avatar_filenames.append(filename)
+            except requests.RequestException as e:
+                print(f"Failed to download avatar {avatar_id}: {e}")
+
+    return avatar_filenames
 
 
 def get_players():
