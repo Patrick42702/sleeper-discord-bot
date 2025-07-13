@@ -50,10 +50,27 @@ def get_avatars(league_id):
 
     for user in users:
         metadata = user.get("metadata")
-        if metadata["avatar"]:
+        avatar_url = ""
+        avatar_id = user.get("avatar")
+        if metadata["avatar"]: # If the user has an avatar
             avatar_url = metadata["avatar"]
+
+            try:
+                res = requests.get(avatar_url)
+                res.raise_for_status()
+
+                content_type = res.headers.get("Content-Type", "").lower()
+                ext = mimetypes.guess_extension(content_type)
+
+
+                filename = f"{avatar_id}.{ext}"
+                file_path = os.path.join("avatars", filename)
+                with open(file_path, "wb") as f:
+                    f.write(res.content)
+                avatar_filenames.append(filename)
+            except requests.RequestException as e:
+                print(f"Failed to download avatar {avatar_id}: {e}")
         else:
-            avatar_id = user.get("avatar")
             avatar_url = f"{AVATAR_CDN}/{avatar_id}"
             try:
                 res = requests.get(avatar_url)
