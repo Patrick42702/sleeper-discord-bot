@@ -43,6 +43,7 @@ class SleeperGroup(app_commands.Group):
     )
     async def set_league(self, interaction: discord.Interaction, league_id: str):
         league = sleeper_api.get_league(league_id)
+        avatars = sleeper_api.get_avatars(league_id)
         if "name" not in league:
             await interaction.response.send_message("❌ Invalid league ID.")
             return
