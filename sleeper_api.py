@@ -66,7 +66,6 @@ def get_avatars(league_id):
                     ext = ".png"
                 filename = f"{user_id}{ext}"
                 file_path = os.path.join("avatars", filename)
-                print(f"This is user: {user_id} ", avatar_url, filename, ext)
                 with open(file_path, "wb") as f:
                     f.write(res.content)
                 avatar_filenames.append(filename)
