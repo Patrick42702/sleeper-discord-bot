@@ -52,7 +52,8 @@ def get_avatars(league_id):
         metadata = user.get("metadata")
         avatar_url = ""
         avatar_id = user.get("avatar")
-        if metadata["avatar"]: # If the user has an avatar
+        user_id = user.get("user_id")
+        if "avatar" in metadata: # If the user has an avatar
             avatar_url = metadata["avatar"]
 
             try:
@@ -61,10 +62,11 @@ def get_avatars(league_id):
 
                 content_type = res.headers.get("Content-Type", "").lower()
                 ext = mimetypes.guess_extension(content_type)
-
-
-                filename = f"{avatar_id}.{ext}"
+                if ext == ".bin":
+                    ext = ".png"
+                filename = f"{user_id}{ext}"
                 file_path = os.path.join("avatars", filename)
+                print(f"This is user: {user_id} ", avatar_url, filename, ext)
                 with open(file_path, "wb") as f:
                     f.write(res.content)
                 avatar_filenames.append(filename)
@@ -84,8 +86,8 @@ def get_avatars(league_id):
                 if not ext:
                     ext = ".webp"
 
-                filename = f"{avatar_id}{ext}"
-                file_path = os.path.join("avatars", f"{avatar_id}.webp")
+                filename = f"{user_id}{ext}"
+                file_path = os.path.join("avatars", filename)
                 with open(file_path, "wb") as f:
                     f.write(res.content)
 
