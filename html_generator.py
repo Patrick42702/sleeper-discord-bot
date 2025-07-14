@@ -1,20 +1,22 @@
 # new file: `html_generator.py`
 import os
+
 from html2image import Html2Image
+
 
 def generate_html_image(matchups, standings, week, output_file="matchup_summary.png"):
     html = f"""
     <html>
     <head>
         <style>
-            body {{ font-family: Arial; background: #f2f2f2; padding: 20px; }}
+            body {{ font-family: Arial; background: #3d3d3d; padding: 20px; color: #f0f0f0; }}
             h2 {{ text-align: center; }}
-            .matchup {{ display: flex; justify-content: space-between; background: #fff; padding: 15px 30px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }}
+            .matchup {{ display: flex; justify-content: space-between; background: #787878; padding: 15px 30px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }}
             .team {{ width: 40%; text-align: center; }}
             .avatar {{ width: 64px; height: 64px; border-radius: 50%; }}
-            .vs {{ font-size: 18px; align-self: center; color: #999; }}
+            .vs {{ font-size: 18px; align-self: center;  }}
             .name {{ font-weight: bold; font-size: 16px; margin-top: 5px; }}
-            .score {{ font-size: 18px; color: #333; }}
+            .score {{ font-size: 18px;  }}
             .standings {{ margin-top: 40px; }}
             .standings-item {{ font-size: 15px; margin: 5px 0; }}
         </style>

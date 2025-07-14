@@ -76,7 +76,6 @@ class SleeperGroup(app_commands.Group):
         await interaction.response.send_message(msg)
         return
 
-    ### ========== /sleeper matchup ==========
     @app_commands.command(
         name="matchup", description="Show matchups for a week"
     )
@@ -87,34 +86,7 @@ class SleeperGroup(app_commands.Group):
             return
 
         league_id = league_settings[channel_id]
-        matchups = sleeper_api.get_matchups(league_id, week)
-        rosters = sleeper_api.get_roster(league_id)
-        users = sleeper_api.get_users_in_league(league_id)
-
-        roster_id_to_owner = {r["roster_id"]: r["owner_id"] for r in rosters}
-        owner_id_to_username = {u["user_id"]: u["display_name"] for u in users}
-        scores = {m["roster_id"]: m["points"] for m in matchups}
-        lineups = {m["roster_id"]: m.get("starters", []) for m in matchups}
-
-        pairs = {}
-        for m in matchups:
-            pairs.setdefault(m["matchup_id"], []).append(m["roster_id"])
-
-        def player_names(starters):
-            return [players_data.get(pid, {}).get("full_name", pid) for pid in starters]
-
-        msg = f"📅 **Here are the matchups for week {week}**\n"
-        # for ids in pairs.values():
-        #     if len(ids) == 2:
-        #         r1, r2 = ids
-        #         u1 = owner_id_to_username.get(roster_id_to_owner.get(r1), "Unknown")
-        #         u2 = owner_id_to_username.get(roster_id_to_owner.get(r2), "Unknown")
-        #         s1 = scores.get(r1, 0)
-        #         s2 = scores.get(r2, 0)
-        #         msg += f"\n__**{u1}**__ ({s1:.2f}) vs __**{u2}**__ ({s2:.2f})\n"
-        #         msg += f"> {u1}'s Starters: {', '.join(player_names(lineups.get(r1, [])))}\n"
-        #         msg += f"> {u2}'s Starters: {', '.join(player_names(lineups.get(r2, [])))}\n"
-
+        msg = f" **Here are the matchups for week {week}**\n"
         await interaction.response.send_message(msg)
 
         # Send styled summary image after text
@@ -154,3 +126,38 @@ class SleeperGroup(app_commands.Group):
         )
         return
 
+    @app_commands.command(name="weekly_recap", description="Get the recap for a week's matchup")
+    async def weekly_recap(self, interaction: discord.Interaction, week: int):
+        channel_id = str(interaction.channel_id)
+
+        if channel_id not in league_settings:
+            await interaction.response.send_message("No default league set.")
+            return
+
+        league_id = league_settings[channel_id]
+
+        try:
+            res = sleeper_api.get_matchups(league_id, week)
+            teams_and_points = [(team["roster_id"], team["points"]) for team in res]
+            sorted_teams_and_points = sorted(teams_and_points, key=lambda x: x[1], reverse=True)
+            rosters = sleeper_api.get_roster(league_id)
+            users = sleeper_api.get_users_in_league(league_id)
+
+            roster_id_to_owner = {r["roster_id"]: r["owner_id"] for r in rosters}
+            owner_id_to_username = {u["user_id"]: u["display_name"] for u in users}
+
+            winner = owner_id_to_username.get(roster_id_to_owner.get(sorted_teams_and_points[0][0]))
+            winner_points = sorted_teams_and_points[0][1]
+            msg = ""
+            msg += (f"### This week's top scorer was __**{winner}**__ with {winner_points}!\n"
+                    f"This is how the rest of the league performed:\n"
+                    )
+            for idx,team in enumerate(sorted_teams_and_points[1:]):
+                team_name = owner_id_to_username.get(roster_id_to_owner.get(team[0]))
+                points_scored = team[1]
+                msg += f"{idx + 2}. {team_name}: {points_scored}\n"
+        except Exception as e:
+            print(f"There was an error: {e}")
+
+        await interaction.response.send_message(msg)
+        return
