@@ -1,6 +1,7 @@
 import discord
 import sleeper_api
 from discord import app_commands
+from tasks import generate_week_summary_image
 from utils import load_json, save_json
 
 # Data files
@@ -102,19 +103,23 @@ class SleeperGroup(app_commands.Group):
         def player_names(starters):
             return [players_data.get(pid, {}).get("full_name", pid) for pid in starters]
 
-        msg = f"📅 **Week {week} Matchups**\n"
-        for ids in pairs.values():
-            if len(ids) == 2:
-                r1, r2 = ids
-                u1 = owner_id_to_username.get(roster_id_to_owner.get(r1), "Unknown")
-                u2 = owner_id_to_username.get(roster_id_to_owner.get(r2), "Unknown")
-                s1 = scores.get(r1, 0)
-                s2 = scores.get(r2, 0)
-                msg += f"\n__**{u1}**__ ({s1:.2f}) vs __**{u2}**__ ({s2:.2f})\n"
-                msg += f"> {u1}'s Starters: {', '.join(player_names(lineups.get(r1, [])))}\n"
-                msg += f"> {u2}'s Starters: {', '.join(player_names(lineups.get(r2, [])))}\n"
+        msg = f"📅 **Here are the matchups for week {week}**\n"
+        # for ids in pairs.values():
+        #     if len(ids) == 2:
+        #         r1, r2 = ids
+        #         u1 = owner_id_to_username.get(roster_id_to_owner.get(r1), "Unknown")
+        #         u2 = owner_id_to_username.get(roster_id_to_owner.get(r2), "Unknown")
+        #         s1 = scores.get(r1, 0)
+        #         s2 = scores.get(r2, 0)
+        #         msg += f"\n__**{u1}**__ ({s1:.2f}) vs __**{u2}**__ ({s2:.2f})\n"
+        #         msg += f"> {u1}'s Starters: {', '.join(player_names(lineups.get(r1, [])))}\n"
+        #         msg += f"> {u2}'s Starters: {', '.join(player_names(lineups.get(r2, [])))}\n"
 
         await interaction.response.send_message(msg)
+
+        # Send styled summary image after text
+        await generate_week_summary_image(interaction.channel, league_id, week)
+
 
     @app_commands.command(name="my_team", description="Show your team starters")
     async def my_team(self, interaction: discord.Interaction):
