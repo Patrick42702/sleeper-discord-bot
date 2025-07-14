@@ -1,6 +1,7 @@
 import glob
 import json
 import os
+from pathlib import Path
 
 
 def load_json(path):
@@ -18,6 +19,6 @@ def save_json(path, data):
 def find_avatar_path(user_id):
     files = glob.glob(f"avatars/{user_id}.*")
     if files:
-        abs_path = os.path.abspath(files[0])
-        return f"file://{abs_path}"
+        abs_path = Path(files[0]).resolve()
+        return abs_path.as_uri()  # gives valid file:// URI on any OS
     return None
