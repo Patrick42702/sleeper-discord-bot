@@ -53,9 +53,8 @@ def get_avatars(league_id):
         avatar_url = ""
         avatar_id = user.get("avatar")
         user_id = user.get("user_id")
-        if "avatar" in metadata: # If the user has an avatar
+        if "avatar" in metadata: # If the user has a league specific avatar
             avatar_url = metadata["avatar"]
-
             try:
                 res = requests.get(avatar_url)
                 res.raise_for_status()
@@ -82,8 +81,8 @@ def get_avatars(league_id):
                 ext = mimetypes.guess_extension(content_type)
 
                 # Fallback to .webp if unknown
-                if not ext:
-                    ext = ".webp"
+                if ext == ".bin":
+                    ext = ".png"
 
                 filename = f"{user_id}{ext}"
                 file_path = os.path.join("avatars", filename)
