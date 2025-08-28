@@ -8,9 +8,9 @@ from utils import load_json, save_json, find_avatar_path
 from html_generator import generate_html_image
 
 # Data files
-USER_FILE = "user_links.json"
-LEAGUE_FILE = "league_settings.json"
-TRACKER_FILE = "weekly_tracker.json"
+USER_FILE = "/app/json/user_links.json"
+LEAGUE_FILE = "/app/json/league_settings.json"
+TRACKER_FILE = "/app/json/weekly_tracker.json"
 
 user_links = load_json(USER_FILE)
 league_settings = load_json(LEAGUE_FILE)

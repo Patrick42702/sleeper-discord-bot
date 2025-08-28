@@ -2,7 +2,7 @@ services:
   app:
     container_name: app
     build:
-      context: .
+      context: ./app
       dockerfile: Dockerfile
     env_file:
       - ~/personal/env-cse/sleeper/.env
