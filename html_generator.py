@@ -1,14 +1,22 @@
 import os
 from html2image import Html2Image
 
-def generate_html_image(matchups, standings, week, output_file="matchup_summary.png"):
+def generate_html_image(matchups, standings, week, output_file=None):
+    if output_file is None:
+        output_file = f"matchup_summary_week_{week}.png"
+
+    # Check if file already exists
+    if os.path.exists(output_file):
+        print(f"[INFO] {output_file} already exists. Skipping regeneration.")
+        return output_file
+    
     html = f"""
     <html>
     <head>
         <style>
             body {{ font-family: Arial; background: #3d3d3d; padding: 20px; color: #f0f0f0; }}
             h2 {{ text-align: center; }}
-            .matchup {{ display: flex; justify-content: space-between; background: #787878; padding: 15px 30px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }}
+            .matchup {{ display: flex; justify-content: space-between; background: #787878; padding: 15px 15px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }}
             .team {{ width: 40%; text-align: center; }}
             .avatar {{ width: 64px; height: 64px; border-radius: 50%; }}
             .vs {{ font-size: 18px; align-self: center; }}
@@ -18,6 +26,7 @@ def generate_html_image(matchups, standings, week, output_file="matchup_summary.
             .score {{ font-size: 18px; }}
             .standings {{ margin-top: 40px; }}
             .standings-item {{ font-size: 15px; margin: 5px 0; }}
+            .team-name {{ font-size: 14px; color: #dcdcdc; font-style: italic; }}
         </style>
     </head>
     <body>
@@ -44,8 +53,9 @@ def generate_html_image(matchups, standings, week, output_file="matchup_summary.
         <div class='matchup'>
             <div class='team'>
                 <img src='{m['team1_avatar']}' class='avatar'>
-                <div class='name'>{name1}</div>
-                <div class='score'>{score1:.2f} pts</div>
+                <div class='name'>{m['team1_name']}</div>
+                <div class='team-name'>{m['team1_team']}</div>
+                <div class='score'>{m['team1_score']} pts</div>
             </div>
             <div class='vs'>vs</div>
             <div class='team'>
@@ -65,5 +75,5 @@ def generate_html_image(matchups, standings, week, output_file="matchup_summary.
         f.write(html)
 
     hti = Html2Image()
-    hti.screenshot(html_file="matchups.html", save_as=output_file, size=(800, 1000))
+    hti.screenshot(html_file="matchups.html", save_as=output_file)
     return output_file
