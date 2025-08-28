@@ -1,23 +1,20 @@
 import datetime
 import os
-
-import discord
 import pytz
-import sleeper_api
-from db_instance import league_settings_db, user_db, weekly_db
+import discord
 from discord.ext import commands, tasks
+import sleeper_api
+from utils import load_json, save_json, find_avatar_path
 from html_generator import generate_html_image
-from utils import find_avatar_path, load_json, save_json
 
 # Data files
-# USER_FILE = "user_links.json"
-# LEAGUE_FILE = "league_settings.json"
-# TRACKER_FILE = "weekly_tracker.json"
-#
-# user_links = load_json(USER_FILE)
-# league_settings = load_json(LEAGUE_FILE)
-# weekly_tracker = load_json(TRACKER_FILE)
+USER_FILE = "user_links.json"
+LEAGUE_FILE = "league_settings.json"
+TRACKER_FILE = "weekly_tracker.json"
 
+user_links = load_json(USER_FILE)
+league_settings = load_json(LEAGUE_FILE)
+weekly_tracker = load_json(TRACKER_FILE)
 
 def get_current_week(league_id):
     league = sleeper_api.get_league(league_id)
@@ -34,28 +31,22 @@ class SummaryTasks(commands.Cog):
         now = datetime.datetime.now(tz)
 
         if now.weekday() == 3 and now.hour == 20:
-            # for channel_id, league_id in league_settings.items():
-            for channel_id in league_settings_db.all():
-                league_id = channel_id
+            for channel_id, league_id in league_settings.items():
                 try:
                     current_week = get_current_week(league_id)
                     last_week = str(int(current_week) - 1)
 
-                    stored_week = weekly_db.get(channel_id)
-                    # if (
-                    #     str(channel_id) in weekly_db
-                    #     and weekly_tracker[str(channel_id)] == last_week
-                    # ):
-                    if stored_week is not None and stored_week == last_week:
+                    if (
+                        str(channel_id) in weekly_tracker
+                        and weekly_tracker[str(channel_id)] == last_week
+                    ):
                         continue
 
                     channel = self.bot.get_channel(int(channel_id))
                     if channel:
                         await send_weekly_summary(channel, league_id, last_week)
-                        # weekly_tracker[str(channel_id)] = last_week
-                        weekly_db.set(channel_id, last_week)
-                        weekly_db.save()
-                        # save_json(TRACKER_FILE, weekly_tracker)
+                        weekly_tracker[str(channel_id)] = last_week
+                        save_json(TRACKER_FILE, weekly_tracker)
                 except Exception as e:
                     print(f"❌ Summary Error in channel {channel_id}: {e}")
 
