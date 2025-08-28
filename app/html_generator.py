@@ -2,22 +2,67 @@ import os
 from html2image import Html2Image
 
 def generate_html_image(matchups, standings, week, output_file="matchup_summary.png"):
+    scale = 1.0 / max(1, len(matchups) / 6)
     html = f"""
     <html>
     <head>
         <style>
-            body {{ font-family: Arial; background: #3d3d3d; padding: 20px; color: #f0f0f0; }}
-            h2 {{ text-align: center; }}
-            .matchup {{ display: flex; justify-content: space-between; background: #787878; padding: 15px 30px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }}
-            .team {{ width: 40%; text-align: center; }}
-            .avatar {{ width: 64px; height: 64px; border-radius: 50%; }}
-            .vs {{ font-size: 18px; align-self: center; }}
-            .name {{ font-size: 16px; margin-top: 5px; }}
-            .winner {{ color: #00ff00; font-weight: bold; }}
+            html, body {{
+                margin: 0;
+                padding: 20px;
+                background: #3d3d3d;
+                font-family: Arial, sans-serif;
+                color: #f0f0f0;
+                overflow: hidden; /* no scrollbar */
+                height: 100%;
+                width: 100%;
+            }}
+
+            body {{
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                box-sizing: border-box;
+                transform-origin: top center;
+                transform: scale({scale})
+            }}
+
+        .matchup {{
+            display: flex;
+            justify-content: space-between;
+            background: #787878;
+            padding: 15px 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 800px;
+            }}
+
+            .team {{
+                width: 40%;
+                text-align: center;
+            }}
+
+            .avatar {{
+                width: 64px;
+                height: 64px;
+                border-radius: 50%;
+            }}
+
+            .vs {{
+                font -size: 18px;
+                align-self: center;
+            }}
+
+            .name {{font -size: 16px; margin-top: 5px; }}
+            .winner {{color: #00ff00; font-weight: bold; }}
             .loser {{ color: #ff6666; }}
-            .score {{ font-size: 18px; }}
-            .standings {{ margin-top: 40px; }}
-            .standings-item {{ font-size: 15px; margin: 5px 0; }}
+            .score {{ font -size: 18px; }}
+
+            .standings {{ margin -top: 40px; }}
+            .standings-item {{ font -size: 15px; margin: 5px 0; }}
         </style>
     </head>
     <body>
@@ -69,5 +114,5 @@ def generate_html_image(matchups, standings, week, output_file="matchup_summary.
         custom_flags=['--no-sandbox',
                       '--log-level=3'],
     )
-    hti.screenshot(html_file="matchups.html", save_as=output_file, size=(800, 1000))
+    hti.screenshot(html_file="matchups.html", save_as=output_file, size=(1200, 1100))
     return output_file
