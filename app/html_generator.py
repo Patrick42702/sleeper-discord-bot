@@ -96,7 +96,7 @@ def generate_html_image(matchups, standings, week, output_file=None):
         <div class='matchup'>
             <div class='team'>
                 <img src='{m['team1_avatar']}' class='avatar'>
-                <div class='name'>{m['team1_name']}</div>
+                <div class='name'>{name1}</div>
                 <div class='team-name'>{m['team1_team']}</div>
                 <div class='score'>{m['team1_score']} pts</div>
             </div>
@@ -104,6 +104,7 @@ def generate_html_image(matchups, standings, week, output_file=None):
             <div class='team'>
                 <img src='{m['team2_avatar']}' class='avatar'>
                 <div class='name'>{name2}</div>
+                <div class='team-name'>{m['team2_team']}</div>
                 <div class='score'>{score2:.2f} pts</div>
             </div>
         </div>
@@ -123,5 +124,5 @@ def generate_html_image(matchups, standings, week, output_file=None):
         custom_flags=['--no-sandbox',
                       '--log-level=3'],
     )
-    hti.screenshot(html_file="matchups.html", save_as=output_file, size=(1200, 1100))
+    hti.screenshot(html_file="matchups.html", save_as=output_file, size=(1200, 1200))
     return output_file
