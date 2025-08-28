@@ -1,5 +1,6 @@
 import asyncio
 import os
+import logging
 
 import discord
 from discord.ext import commands
@@ -7,6 +8,8 @@ from dotenv import load_dotenv
 from sleeper_group import SleeperGroup
 from tasks import SummaryTasks
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 load_dotenv()
 TOKEN = os.environ["TOKEN"]
 
@@ -22,10 +25,10 @@ class MyBot(commands.Bot):
         await self.add_cog(SummaryTasks(self))
 
         await self.tree.sync()
-        print("Slash commands synced")
+        logger.info("Commands synced.")
 
     async def on_ready(self):
-        print(f"Logged in as {self.user}")
+        logger.info(f"Logged in as {self.user}")
 
 bot = MyBot()
 

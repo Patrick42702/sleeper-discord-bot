@@ -103,6 +103,10 @@ async def generate_week_summary_image(channel, league_id, week):
     roster_id_to_owner = {r["roster_id"]: r["owner_id"] for r in rosters}
     owner_id_to_username = {u["user_id"]: u["display_name"] for u in users}
     scores = {m["roster_id"]: m["points"] for m in matchups}
+    owner_id_to_teamname = {
+        u["user_id"]: u.get("metadata", {}).get("team_name", "") 
+        for u in users
+    }   
 
     pairs = {}
     for m in matchups:
@@ -116,9 +120,11 @@ async def generate_week_summary_image(channel, league_id, week):
                 "team1_name": owner_id_to_username.get(roster_id_to_owner.get(r1), "Unknown"),
                 "team1_score": scores.get(r1, 0),
                 "team1_avatar": find_avatar_path(roster_id_to_owner.get(r1)),
+                "team1_team": owner_id_to_teamname.get(roster_id_to_owner.get(r1), ""),
                 "team2_name": owner_id_to_username.get(roster_id_to_owner.get(r2), "Unknown"),
                 "team2_score": scores.get(r2, 0),
-                "team2_avatar": find_avatar_path(roster_id_to_owner.get(r2))
+                "team2_avatar": find_avatar_path(roster_id_to_owner.get(r2)),
+                "team2_team": owner_id_to_teamname.get(roster_id_to_owner.get(r2), ""),
             })
 
     standings = sleeper_api.get_standings(league_id)

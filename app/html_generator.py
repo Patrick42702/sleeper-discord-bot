@@ -1,8 +1,15 @@
 import os
 from html2image import Html2Image
 
-def generate_html_image(matchups, standings, week, output_file="matchup_summary.png"):
+def generate_html_image(matchups, standings, week, output_file=None):
     scale = 1.0 / max(1, len(matchups) / 6)
+    if output_file is None:
+        output_file = f"matchup_summary_week_{week}.png"
+
+    # Check if file already exists
+    if os.path.exists(output_file):
+        print(f"[INFO] {output_file} already exists. Skipping regeneration.")
+        return output_file
     html = f"""
     <html>
     <head>
@@ -89,8 +96,9 @@ def generate_html_image(matchups, standings, week, output_file="matchup_summary.
         <div class='matchup'>
             <div class='team'>
                 <img src='{m['team1_avatar']}' class='avatar'>
-                <div class='name'>{name1}</div>
-                <div class='score'>{score1:.2f} pts</div>
+                <div class='name'>{m['team1_name']}</div>
+                <div class='team-name'>{m['team1_team']}</div>
+                <div class='score'>{m['team1_score']} pts</div>
             </div>
             <div class='vs'>vs</div>
             <div class='team'>
@@ -108,6 +116,7 @@ def generate_html_image(matchups, standings, week, output_file="matchup_summary.
 
     with open("matchups.html", "w", encoding="utf-8") as f:
         f.write(html)
+
 
     hti = Html2Image(
         browser_executable='/usr/bin/chromium',
