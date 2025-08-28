@@ -81,7 +81,7 @@ def get_avatars(league_id):
                 ext = mimetypes.guess_extension(content_type)
 
                 # Fallback to .webp if unknown
-                if ext == ".bin":
+                if ext == ".bin" or ext is None:
                     ext = ".png"
 
                 filename = f"{user_id}{ext}"

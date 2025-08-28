@@ -5,10 +5,10 @@ from tasks import generate_week_summary_image
 from utils import load_json, save_json
 
 # Data files
-USER_FILE = "user_links.json"
-LEAGUE_FILE = "league_settings.json"
-TRACKER_FILE = "weekly_tracker.json"
-PLAYER_FILE = "players.json"
+USER_FILE = "/app/json/user_links.json"
+LEAGUE_FILE = "/app/json/league_settings.json"
+TRACKER_FILE = "/app/json/weekly_tracker.json"
+PLAYER_FILE = "/app/json/players.json"
 
 user_links = load_json(USER_FILE)
 league_settings = load_json(LEAGUE_FILE)

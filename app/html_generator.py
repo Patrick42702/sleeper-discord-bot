@@ -74,6 +74,11 @@ def generate_html_image(matchups, standings, week, output_file=None):
     with open("matchups.html", "w", encoding="utf-8") as f:
         f.write(html)
 
-    hti = Html2Image()
-    hti.screenshot(html_file="matchups.html", save_as=output_file)
+
+    hti = Html2Image(
+        browser_executable='/usr/bin/chromium',
+        custom_flags=['--no-sandbox',
+                      '--log-level=3'],
+    )
+    hti.screenshot(html_file="matchups.html", save_as=output_file, size=(800, 1000))
     return output_file
