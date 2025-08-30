@@ -5,6 +5,8 @@ import requests
 
 BASE = "https://api.sleeper.app/v1"
 AVATAR_CDN = "https://sleepercdn.com/avatars"
+STATS_BASE = "https://api.sleeper.app/stats"
+
 
 def get_user(username_or_id):
     res = requests.get(f"{BASE}/user/{username_or_id}")
@@ -39,8 +41,10 @@ def get_matchups(league_id, week):
 def get_standings(league_id):
     rosters = get_roster(league_id)
     return sorted(
-        rosters, key=lambda r: (-r["settings"]["wins"], r["settings"]["losses"])
+        rosters, key=lambda r: (-r["settings"]["wins"],
+                                r["settings"]["losses"])
     )
+
 
 def get_avatars(league_id):
     users = get_users_in_league(league_id)
@@ -53,7 +57,7 @@ def get_avatars(league_id):
         avatar_url = ""
         avatar_id = user.get("avatar")
         user_id = user.get("user_id")
-        if "avatar" in metadata: # If the user has a league specific avatar
+        if "avatar" in metadata:  # If the user has a league specific avatar
             avatar_url = metadata["avatar"]
             try:
                 res = requests.get(avatar_url)
@@ -99,3 +103,13 @@ def get_avatars(league_id):
 def get_players():
     res = requests.get(f"{BASE}/players/nfl")
     return res.json()
+
+
+def get_state():
+    res = requests.get(f"{BASE}/state/nfl")
+    return res.json()
+
+
+def get_player_points(player_id, week):
+    res = requests.get(
+        f"{STATS_BASE}/nfl/player/{player_id}?season_type=regular&season=2025&grouping=week")
