@@ -139,7 +139,7 @@ class SleeperGroup(app_commands.Group):
 
         try:
             summary_info = await generate_weekly_summary(channel_id, league_id, week)
-            generate_week_html(summary_info)
+            generate_week_html(summary_info, week)
             # await interaction.response.send_message(msg)
             summary_image = (summary_info)
 

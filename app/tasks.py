@@ -76,11 +76,11 @@ async def generate_weekly_summary(channel, league_id, week):
                 "score": m["points"],
                 "avatar": find_avatar_path(roster_id_to_owner.get(m["roster_id"]))
             }
-            best_starter = (0, 0)
+            best_starter = (None, 0)
             for idx in range(0, len(starters_pts)):
                 if starters_pts[idx][1] > best_starter[1]:
                     best_starter = starters_pts[idx]
-            if best_starter[0] != 0:
+            if best_starter[0] is not None:
                 best_starter_data = sleeper_api.get_player_points(
                     best_starter[0], week)
                 best_starter_name = players[best_starter[0]]["full_name"]
@@ -90,7 +90,11 @@ async def generate_weekly_summary(channel, league_id, week):
                 info["best_starter_name"] = None
                 info["best_starter_data"] = None
             summary.append(info)
+
+        summary = list(sorted(summary, key=lambda x: x["score"], reverse=True))
+
         return summary
+
     except Exception:
         logger.exception("The following exception occured")
 
