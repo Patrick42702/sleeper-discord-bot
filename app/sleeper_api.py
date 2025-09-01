@@ -113,3 +113,4 @@ def get_state():
 def get_player_points(player_id, week):
     res = requests.get(
         f"{STATS_BASE}/nfl/player/{player_id}?season_type=regular&season=2025&grouping=week")
+    return res.json()

@@ -1,18 +1,20 @@
 import discord
 import sleeper_api
 from discord import app_commands
-from tasks import generate_week_summary_image
+from tasks import generate_matchup_summary, generate_weekly_summary
 from utils import load_json, save_json
+from week_summary_generator import generate_week_html
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Data files
 USER_FILE = "/app/json/user_links.json"
 LEAGUE_FILE = "/app/json/league_settings.json"
-TRACKER_FILE = "/app/json/weekly_tracker.json"
 PLAYER_FILE = "/app/json/players.json"
 
 user_links = load_json(USER_FILE)
 league_settings = load_json(LEAGUE_FILE)
-weekly_tracker = load_json(TRACKER_FILE)
 players_data = load_json(PLAYER_FILE)
 
 
@@ -34,7 +36,7 @@ class SleeperGroup(app_commands.Group):
         user_links[str(discord_user.id)] = sleeper_user_id
         save_json(USER_FILE, user_links)
         await interaction.response.send_message(
-            f"✅ Linked {discord_user.mention} to Sleeper ID `{sleeper_user_id}`."
+            f"✅ Linked {discord_user.mention} to Sleeper ID {sleeper_user_id}."
         )
         return
 
@@ -90,8 +92,7 @@ class SleeperGroup(app_commands.Group):
         await interaction.response.send_message(msg)
 
         # Send styled summary image after text
-        await generate_week_summary_image(interaction.channel, league_id, week)
-
+        await generate_matchup_summary(interaction.channel, league_id, week)
 
     @app_commands.command(name="my_team", description="Show your team starters")
     async def my_team(self, interaction: discord.Interaction):
@@ -126,7 +127,7 @@ class SleeperGroup(app_commands.Group):
         )
         return
 
-    @app_commands.command(name="weekly_recap", description="Get the recap for a week's matchup")
+    @app_commands.command(name="weekly_recap", description="Get recap of the league's week")
     async def weekly_recap(self, interaction: discord.Interaction, week: int):
         channel_id = str(interaction.channel_id)
 
@@ -137,27 +138,11 @@ class SleeperGroup(app_commands.Group):
         league_id = league_settings[channel_id]
 
         try:
-            res = sleeper_api.get_matchups(league_id, week)
-            teams_and_points = [(team["roster_id"], team["points"]) for team in res]
-            sorted_teams_and_points = sorted(teams_and_points, key=lambda x: x[1], reverse=True)
-            rosters = sleeper_api.get_roster(league_id)
-            users = sleeper_api.get_users_in_league(league_id)
+            summary_info = await generate_weekly_summary(channel_id, league_id, week)
+            generate_week_html(summary_info)
+            # await interaction.response.send_message(msg)
+            summary_image = (summary_info)
 
-            roster_id_to_owner = {r["roster_id"]: r["owner_id"] for r in rosters}
-            owner_id_to_username = {u["user_id"]: u["display_name"] for u in users}
-
-            winner = owner_id_to_username.get(roster_id_to_owner.get(sorted_teams_and_points[0][0]))
-            winner_points = sorted_teams_and_points[0][1]
-            msg = ""
-            msg += (f"### This week's top scorer was __**{winner}**__ with {winner_points}!\n"
-                    f"This is how the rest of the league performed:\n"
-                    )
-            for idx,team in enumerate(sorted_teams_and_points[1:]):
-                team_name = owner_id_to_username.get(roster_id_to_owner.get(team[0]))
-                points_scored = team[1]
-                msg += f"{idx + 2}. {team_name}: {points_scored}\n"
-        except Exception as e:
-            print(f"There was an error: {e}")
-
-        await interaction.response.send_message(msg)
+        except Exception:
+            logger.exception("There was an error")
         return

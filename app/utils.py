@@ -16,6 +16,7 @@ def save_json(path, data):
     with open(path, "w") as f:
         json.dump(data, f, indent=2)
 
+
 def find_avatar_path(user_id):
     files = glob.glob(f"avatars/{user_id}.*")
     if files:
