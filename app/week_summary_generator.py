@@ -110,17 +110,3 @@ def generate_week_html(summary_info, week, output_file=None):
     hti.screenshot(html_file="week_summary.html",
                    save_as=output_file, size=(1200, 1200))
     return output_file
-
-#   <div class="leaderboard">
-#     {% for player in summary[3:] %}
-#       <div class="player">
-#         <img src="{{player.avatar}}">
-#         <div class="info">
-#           <p><b>{{player.team_name}}</b> - {{player.best_player}} ({{player.best_points}} pts)</p>
-#         </div>
-#         <div class="points">{{player.points}} pts</div>
-#       </div>
-#     {% endfor %}
-#   </div>
-# </body>
-# </html>
