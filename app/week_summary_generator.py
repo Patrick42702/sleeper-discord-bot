@@ -78,8 +78,7 @@ def generate_week_html(summary_info, week, output_file=None):
     """
 
     for player in summary_info[3:]:
-        best_starter_points = None
-        best_starter_data = player.get("best_starter_data", {})
+        best_starter_data = player.get("best_starter_data") or {}
         best_starter_points = best_starter_data.get("points", 0)
 
         html += f"""
