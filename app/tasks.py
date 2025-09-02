@@ -1,4 +1,5 @@
 from html_generator import generate_html_image
+from week_summary_generator import generate_week_html
 from utils import load_json, save_json, find_avatar_path
 import sleeper_api
 from discord.ext import commands, tasks
@@ -73,8 +74,9 @@ async def generate_weekly_summary(channel, league_id, week):
             starters_pts = list(zip(m["starters"], m["starters_points"]))
             info = {
                 "roster_id": m["roster_id"],
-                "score": m["points"],
-                "avatar": find_avatar_path(roster_id_to_owner.get(m["roster_id"]))
+                "score": score,
+                "avatar": find_avatar_path(roster_id_to_owner.get(roster_id)),
+                "team_name": owner_id_to_teamname.get(roster_id_to_owner.get(roster_id))
             }
             best_starter = (None, 0)
             for idx in range(0, len(starters_pts)):
@@ -92,8 +94,8 @@ async def generate_weekly_summary(channel, league_id, week):
             summary.append(info)
 
         summary = list(sorted(summary, key=lambda x: x["score"], reverse=True))
-
-        return summary
+        image_path = generate_week_html(summary, week)
+        await channel.send(file=discord.File(image_path))
 
     except Exception:
         logger.exception("The following exception occured")

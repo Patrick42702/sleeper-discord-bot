@@ -3,7 +3,6 @@ import sleeper_api
 from discord import app_commands
 from tasks import generate_matchup_summary, generate_weekly_summary
 from utils import load_json, save_json
-from week_summary_generator import generate_week_html
 import logging
 
 logger = logging.getLogger(__name__)
@@ -138,10 +137,9 @@ class SleeperGroup(app_commands.Group):
         league_id = league_settings[channel_id]
 
         try:
-            summary_info = await generate_weekly_summary(channel_id, league_id, week)
-            generate_week_html(summary_info, week)
-            # await interaction.response.send_message(msg)
-            summary_image = (summary_info)
+            msg = f" **Here is the recap for week {week}**\n"
+            await interaction.response.send_message(msg)
+            await generate_weekly_summary(interaction.channel, league_id, week)
 
         except Exception:
             logger.exception("There was an error")
