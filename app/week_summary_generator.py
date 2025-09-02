@@ -58,20 +58,20 @@ def generate_week_html(summary_info, week, output_file=None):
 
             <div class="podium">
                 <div class="place second">
-                    <img src="{summary_info[1]["avatar"]}">
-                    <p>{summary_info[1]["team_name"]}</p>
-                    <p>{summary_info[1]["score"]} pts</p>
+                    <img src="{summary_info[1].get("avatar", "No avatar")}">
+                    <p>{summary_info[1].get("team_name")}</p>
+                    <p>{summary_info[1].get("score")} pts</p>
                 </div>
                 <div class="place first">
-                    <img src="{summary_info[0]["avatar"]}">
-                    <p>{summary_info[0]["team_name"]}</p>
-                    <p>{summary_info[0]["score"]} pts</p>
+                    <img src="{summary_info[0].get("avatar")}">
+                    <p>{summary_info[0].get("team_name")}</p>
+                    <p>{summary_info[0].get("score")} pts</p>
 
                 </div>
                 <div class="place third">
-                    <img src="{summary_info[2]["avatar"]}">
-                    <p>{summary_info[2]["team_name"]}</p>
-                    <p>{summary_info[2]["score"]} pts</p>
+                    <img src="{summary_info[2].get("avatar")}">
+                    <p>{summary_info[2].get("team_name")}</p>
+                    <p>{summary_info[2].get("score")} pts</p>
                 </div>
             </div>
             <div class="leaderboard">
@@ -79,15 +79,14 @@ def generate_week_html(summary_info, week, output_file=None):
 
     for player in summary_info[3:]:
         best_starter_points = None
-        logger.info(f"this is the player: {player}")
-        if player["best_starter_data"] is not None and "points" in player["best_starter_data"]:
-            best_starter_points = player["best_starter_data"]["points"]
+        best_starter_data = player.get("best_starter_data", {})
+        best_starter_points = best_starter_data.get("points", 0)
 
         html += f"""
             <div class="player">
-                <img src="{player["avatar"]}">
+                <img src="{player.get("avatar")}">
                 <div class="info">
-                <p><b>{player["team_name"]}</b> - {player["best_starter_name"]} ({best_starter_points} pts)</p>
+                <p><b>{player.get("team_name")}</b> - {player.get("best_starter_name")} ({best_starter_points} pts)</p>
                 <div class="points">{player.get("points", 0)} pts</div>
                 </div>
             </div>
