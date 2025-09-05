@@ -14,7 +14,7 @@ def generate_week_html(summary_info, week, output_file=None):
     <html>
     <head>
         <style>
-            body {{ font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; }}
+            body {{ font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; overflow: hidden; }}
             h1 {{ text-align: center; }}
 
             .podium {{
@@ -86,7 +86,7 @@ def generate_week_html(summary_info, week, output_file=None):
                 <img src="{player.get("avatar")}">
                 <div class="info">
                 <p><b>{player.get("team_name")}</b> - {player.get("best_starter_name")} ({best_starter_points} pts)</p>
-                <div class="points">{player.get("points", 0)} pts</div>
+                <div class="points">{player.get("score", 0)} pts</div>
                 </div>
             </div>
         """
@@ -106,5 +106,5 @@ def generate_week_html(summary_info, week, output_file=None):
                       '--log-level=3'],
     )
     hti.screenshot(html_file="week_summary.html",
-                   save_as=output_file, size=(1200, 1200))
+                   save_as=output_file, size=(1300, 1300))
     return output_file

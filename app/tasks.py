@@ -72,11 +72,17 @@ async def generate_weekly_summary(channel, league_id, week):
             roster_id = m["roster_id"]
             score = m["points"]
             starters_pts = list(zip(m["starters"], m["starters_points"]))
+            owner_id = roster_id_to_owner.get(roster_id)
+            if owner_id_to_teamname.get(owner_id) == "":
+                team_name = owner_id_to_username.get(owner_id)
+            else:
+                team_name = owner_id_to_teamname.get(owner_id)
             info = {
                 "roster_id": m["roster_id"],
+                "owner_id": roster_id_to_owner.get(roster_id),
                 "score": score,
                 "avatar": find_avatar_path(roster_id_to_owner.get(roster_id)),
-                "team_name": owner_id_to_teamname.get(roster_id_to_owner.get(roster_id))
+                "team_name": team_name
             }
             best_starter = (None, 0)
             for idx in range(0, len(starters_pts)):
@@ -85,9 +91,14 @@ async def generate_weekly_summary(channel, league_id, week):
             if best_starter[0] is not None:
                 best_starter_data = sleeper_api.get_player_points(
                     best_starter[0], week)
-                best_starter_name = players[best_starter[0]]["full_name"]
+                if "full_name" in players.get(best_starter[0], {}):
+                    best_starter_name = players[best_starter[0]]["full_name"]
+                else:
+                    best_starter_name = players[best_starter[0]]["team"]
                 info["best_starter_name"] = best_starter_name
-                info["best_starter_data"] = best_starter_data[week]
+                info["best_starter_data"] = {}
+                if best_starter_data is not None:
+                    info["best_starter_data"] = best_starter_data.get(week, {})
             else:
                 info["best_starter_name"] = None
                 info["best_starter_data"] = None
