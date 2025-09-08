@@ -1,0 +1,23 @@
+# auth-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sleeper-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sleeper-app
+  template:
+    metadata:
+      labels:
+        app: sleeper-app
+    spec:
+      containers:
+        - name: sleeper-app
+          image:  us-east4-docker.pkg.dev/my-gcp-project-466212/video-app-repo/sleeper-bot:latest
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: sleeper-bot-secret
+

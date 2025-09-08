@@ -38,12 +38,14 @@ class SummaryTasks(commands.Cog):
         if now.weekday() == 1 and now.hour == 9 and now.minute == 0:  # Every Tuesday at 9:00 AM ET
             for channel_id, league_id in league_settings.items():
                 try:
-                    current_week = get_current_week() # BUG: USE IN PROD
-                    current_week = 2 if int(current_week) <= 1 else current_week
+                    current_week = get_current_week()  # BUG: USE IN PROD
+                    current_week = 2 if int(
+                        current_week) <= 1 else current_week
                     last_week = str(int(current_week) - 1)
                     channel = self.bot.get_channel(int(channel_id))
                     if channel:
                         await generate_weekly_summary(channel, league_id, last_week)
+                        await generate_html_image(channel, league_id, last_week)
                 except Exception as e:
                     print(f"❌ Summary Error in channel {channel_id}: {e}")
 
@@ -108,6 +110,12 @@ async def generate_weekly_summary(channel, league_id, week):
 
         summary = list(sorted(summary, key=lambda x: x["score"], reverse=True))
         image_path = generate_week_html(summary, week)
+
+        msg = f"@everyone\n"
+        msg += f"**Week {week} Summary **\n"
+        for i, player in enumerate(summary):
+            msg += f"{i+1}. {player.get('team_name')} — **{player.get('score', 0)}** pts\n"
+        await channel.send(msg)
         await channel.send(file=discord.File(image_path))
 
     except Exception:
