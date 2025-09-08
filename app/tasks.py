@@ -35,15 +35,15 @@ class SummaryTasks(commands.Cog):
         tz = pytz.timezone("US/Eastern")
         now = datetime.datetime.now(tz)
 
-        if now.weekday() == 6 and now.hour == 12:
+        if now.weekday() == 1 and now.hour == 9 and now.minute == 0:  # Every Tuesday at 9:00 AM ET
             for channel_id, league_id in league_settings.items():
                 try:
-                    # current_week = get_current_week() # BUG: USE IN PROD
-                    current_week = 2
+                    current_week = get_current_week() # BUG: USE IN PROD
+                    current_week = 2 if int(current_week) <= 1 else current_week
                     last_week = str(int(current_week) - 1)
                     channel = self.bot.get_channel(int(channel_id))
                     if channel:
-                        summary_data = await generate_weekly_summary(channel, league_id, last_week)
+                        await generate_weekly_summary(channel, league_id, last_week)
                 except Exception as e:
                     print(f"❌ Summary Error in channel {channel_id}: {e}")
 
@@ -96,11 +96,13 @@ async def generate_weekly_summary(channel, league_id, week):
                 else:
                     best_starter_name = players[best_starter[0]]["team"]
                 info["best_starter_name"] = best_starter_name
+                info["best_starter_points"] = best_starter[1]
                 info["best_starter_data"] = {}
                 if best_starter_data is not None:
                     info["best_starter_data"] = best_starter_data.get(week, {})
             else:
                 info["best_starter_name"] = None
+                info["best_starter_points"] = 0
                 info["best_starter_data"] = None
             summary.append(info)
 
